@@ -10,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { passwordStrength } from "check-password-strength"
 
 import PasswordComponent from "./PasswordComponent"
+import { registerUser } from "@/src/lib/actions/authAction"
+import { toast } from "react-toastify"
 
 const FormSchema = z.object({
   firstName: z
@@ -58,7 +60,17 @@ function SignUpForm() {
   const [isVisiblePass, setIsVisiblePass] = React.useState<boolean>(false)
   const [passStrength, setPassStrength] = React.useState<number>(0)
   
-  const saveUser: SubmitHandler<InputType> = async(data) => console.log({data})
+  const saveUser: SubmitHandler<InputType> = async(data) => {
+    const {accepted, confirmPassword, ...user} = data
+
+    try{
+      const result = await registerUser(user)
+      toast.success("User registered successfully")
+    }catch(error){
+      toast.error("Something went wrong")
+      console.log((error as Error).message)
+    }
+  }
 
   React.useEffect(() => setPassStrength(passwordStrength(watch().password).id), [watch])
 
