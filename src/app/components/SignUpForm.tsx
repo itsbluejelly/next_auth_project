@@ -5,19 +5,20 @@ import {UserIcon, EnvelopeIcon, KeyIcon, PhoneIcon, EyeIcon, EyeSlashIcon} from 
 import React from "react"
 import {z} from "zod"
 import validator from "validator"
+import {Controller, SubmitHandler, useForm} from "react-hook-form" 
 
 const FormSchema = z.object({
   firstName: z
     .string()
     .min(2, "First name has minimum of 2 characters")
     .max(45, "First name has maximum of 45 characters")
-    .regex(new RegExp("^[a-zA-Z]+$", "No special characters allowed")),
+    .regex(new RegExp("^[a-zA-Z]+$"), "No special characters allowed"),
 
   lastName: z
     .string()
     .min(2, "First name has minimum of 2 characters")
     .max(45, "First name has maximum of 45 characters")
-    .regex(new RegExp("^[a-zA-Z]+$", "No special characters allowed")),
+    .regex(new RegExp("^[a-zA-Z]+$"), "No special characters allowed"),
 
   email: z.string().email("Please enter a valid email"),
   phone: z.string().refine(validator.isMobilePhone, "Please enter valid phone number"),
@@ -38,27 +39,47 @@ const FormSchema = z.object({
   path: ["password", "confirmPassword"] 
 })
 
-function SignUpForm() {
-  const [isVisiblePass, setIsVisiblePass] = React.useState<boolean>(false)
-  return (
-    <form className="grid grid-cols-2 gap-3 p-2 shadow border rounded-md place-self-stretch">
-      <Input label="First Name" startContent={<UserIcon className="w-4" />} />
+type InputType = z.infer<typeof FormSchema>
 
-      <Input label="Last Name" startContent={<UserIcon className="w-4" />} />
+function SignUpForm() {
+  const {register, handleSubmit, reset, control} = useForm<InputType>()
+  const [isVisiblePass, setIsVisiblePass] = React.useState<boolean>(false)
+  
+  const saveUser: SubmitHandler<InputType> = async(data) => console.log({data})
+
+  return (
+    <form
+      className="grid grid-cols-2 gap-3 p-2 shadow border rounded-md place-self-stretch"
+      onSubmit={handleSubmit(saveUser)}
+    >
+      <Input
+        {...register("firstName")}
+        label="First Name"
+        startContent={<UserIcon className="w-4" />}
+      />
 
       <Input
+        {...register("lastName")}
+        label="Last Name"
+        startContent={<UserIcon className="w-4" />}
+      />
+
+      <Input
+        {...register("email")}
         label="Email"
         startContent={<EnvelopeIcon className="w-4" />}
         className="col-span-2"
       />
 
       <Input
+        {...register("phone")}
         label="Phone"
         startContent={<PhoneIcon className="w-4" />}
         className="col-span-2"
       />
 
       <Input
+        {...register("password")}
         label="Password"
         type={isVisiblePass ? "text" : "password"}
         startContent={<KeyIcon className="w-4" />}
@@ -79,22 +100,32 @@ function SignUpForm() {
       />
 
       <Input
+        {...register("confirmPassword")}
         label="Confirm Password"
         type="Password"
         startContent={<KeyIcon className="w-4" />}
         className="col-span-2"
       />
 
-      <Checkbox className="col-span-2">
-        I accept the <Link href="/terms">Terms</Link>
-      </Checkbox>
+      <Controller
+        control={control}
+        name="accepted"
+        
+        render={({ field }) => (
+          <Checkbox 
+            className="col-span-2"
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+          >
+            I accept the <Link href="/terms">Terms</Link>
+          </Checkbox>
+        )}
+      />
 
       <div className="flex justify-center col-span-2">
-        <Button 
-          type="submit" 
-          color="primary"
-          className="w-48"
-        >Submit</Button>
+        <Button type="submit" color="primary" className="w-48">
+          Submit
+        </Button>
       </div>
     </form>
   );
