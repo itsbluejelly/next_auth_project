@@ -7,6 +7,9 @@ import {z} from "zod"
 import validator from "validator"
 import {Controller, SubmitHandler, useForm} from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { passwordStrength } from "check-password-strength"
+
+import PasswordComponent from "./PasswordComponent"
 
 const FormSchema = z.object({
   firstName: z
@@ -43,10 +46,21 @@ const FormSchema = z.object({
 type InputType = z.infer<typeof FormSchema>
 
 function SignUpForm() {
-  const {register, handleSubmit, reset, control, formState:{errors}} = useForm<InputType>({ resolver: zodResolver(FormSchema) })
+  const {
+    register, 
+    handleSubmit, 
+    reset, 
+    control, 
+    formState:{errors},
+    watch
+  } = useForm<InputType>({ resolver: zodResolver(FormSchema) })
+
   const [isVisiblePass, setIsVisiblePass] = React.useState<boolean>(false)
+  const [passStrength, setPassStrength] = React.useState<number>(0)
   
   const saveUser: SubmitHandler<InputType> = async(data) => console.log({data})
+
+  React.useEffect(() => setPassStrength(passwordStrength(watch().password).id), [watch])
 
   return (
     <form
@@ -120,6 +134,8 @@ function SignUpForm() {
         startContent={<KeyIcon className="w-4" />}
         className="col-span-2"
       />
+
+      <PasswordComponent passStrength={passStrength}/>
 
       <Controller
         control={control}
