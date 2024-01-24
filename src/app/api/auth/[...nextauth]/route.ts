@@ -3,42 +3,60 @@ import {AuthOptions} from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
 import NextAuth from "next-auth/next"
+import { User } from "@prisma/client"
 
-export const authOptions: AuthOptions = { providers: [CredentialsProvider({ 
-    name: "Credentials",
+export const authOptions: AuthOptions = { 
+    providers: [CredentialsProvider({ 
+        name: "Credentials",
 
-    credentials: {
-        username: { 
-            label: "User Name",
-            type: "text",
-            placeholder: "Your User Name"
+        credentials: {
+            username: { 
+                label: "User Name",
+                type: "text",
+                placeholder: "Your User Name"
+            },
+
+            password : { 
+                label: "Password",
+                type: "password"
+            }
         },
 
-        password : { 
-            label: "Password",
-            type: "password"
+        async authorize(credentials){
+            const user = await prisma.user.findUnique({ where: { email: credentials?.username }})
+
+            if(!user){
+                throw new Error("User name or password is invalid ")
+            }else if(!credentials?.password){
+                throw new Error("Please provide the password")  
+            }
+
+            const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password)
+
+            if(!isPasswordCorrect){
+                throw new Error("Please provide the right password or username")
+            }
+
+            const {password, ...otherDetails} = user
+            return otherDetails
         }
-    },
+    })],
 
-    async authorize(credentials){
-        const user = await prisma.user.findUnique({ where: { email: credentials?.username }})
+    callbacks: {
+        async jwt({token, user}){
+            if(user){
+                token.user = user as User
+            }
+            
+            return token
+        },
 
-        if(!user){
-            throw new Error("User name or password is invalid ")
-        }else if(!credentials?.password){
-            throw new Error("Please provide the password")  
+        async session({token, session}){
+            session.user = token.user
+            return session
         }
-
-        const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password)
-
-        if(!isPasswordCorrect){
-            throw new Error("Please provide the right password or username")
-        }
-
-        const {password, ...otherDetails} = user
-        return otherDetails
     }
-})]}
+}
 
 const handler = NextAuth(authOptions)
 
