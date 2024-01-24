@@ -5,7 +5,7 @@ import bcrypt from "bcrypt"
 import NextAuth from "next-auth/next"
 import { User } from "@prisma/client"
 
-export const authOptions: AuthOptions = {
+const authOptions: AuthOptions = {
     pages: { signIn: "/auth/signIn" },
 
     providers: [CredentialsProvider({ 
@@ -60,4 +60,5 @@ export const authOptions: AuthOptions = {
     }
 }
 
-export default NextAuth(req, res, authOptions)
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST}
