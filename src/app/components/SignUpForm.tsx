@@ -5,7 +5,8 @@ import {UserIcon, EnvelopeIcon, KeyIcon, PhoneIcon, EyeIcon, EyeSlashIcon} from 
 import React from "react"
 import {z} from "zod"
 import validator from "validator"
-import {Controller, SubmitHandler, useForm} from "react-hook-form" 
+import {Controller, SubmitHandler, useForm} from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 const FormSchema = z.object({
   firstName: z
@@ -36,13 +37,13 @@ const FormSchema = z.object({
   accepted: z.literal(true, { errorMap: () => ({ message: "Please accept all terms" })})
 }).refine(data => data.password === data.confirmPassword, { 
   message: "Password and confirm password don't match!",
-  path: ["password", "confirmPassword"] 
+  path: ["confirmPassword"]
 })
 
 type InputType = z.infer<typeof FormSchema>
 
 function SignUpForm() {
-  const {register, handleSubmit, reset, control} = useForm<InputType>()
+  const {register, handleSubmit, reset, control, formState:{errors}} = useForm<InputType>({ resolver: zodResolver(FormSchema) })
   const [isVisiblePass, setIsVisiblePass] = React.useState<boolean>(false)
   
   const saveUser: SubmitHandler<InputType> = async(data) => console.log({data})
@@ -53,18 +54,24 @@ function SignUpForm() {
       onSubmit={handleSubmit(saveUser)}
     >
       <Input
+        errorMessage={errors.firstName?.message}
+        isInvalid={!!errors.firstName}
         {...register("firstName")}
         label="First Name"
         startContent={<UserIcon className="w-4" />}
       />
 
       <Input
+        errorMessage={errors.lastName?.message}
+        isInvalid={!!errors.lastName}
         {...register("lastName")}
         label="Last Name"
         startContent={<UserIcon className="w-4" />}
       />
 
       <Input
+        errorMessage={errors.email?.message}
+        isInvalid={!!errors.email}
         {...register("email")}
         label="Email"
         startContent={<EnvelopeIcon className="w-4" />}
@@ -72,6 +79,8 @@ function SignUpForm() {
       />
 
       <Input
+        errorMessage={errors.phone?.message}
+        isInvalid={!!errors.phone}
         {...register("phone")}
         label="Phone"
         startContent={<PhoneIcon className="w-4" />}
@@ -79,11 +88,14 @@ function SignUpForm() {
       />
 
       <Input
+        errorMessage={errors.password?.message}
+        isInvalid={!!errors.password}
         {...register("password")}
         label="Password"
         type={isVisiblePass ? "text" : "password"}
         startContent={<KeyIcon className="w-4" />}
         className="col-span-2"
+        
         endContent={
           !isVisiblePass ? (
             <EyeIcon
@@ -100,6 +112,8 @@ function SignUpForm() {
       />
 
       <Input
+        errorMessage={errors.confirmPassword?.message}
+        isInvalid={!!errors.confirmPassword}
         {...register("confirmPassword")}
         label="Confirm Password"
         type="Password"
@@ -110,9 +124,8 @@ function SignUpForm() {
       <Controller
         control={control}
         name="accepted"
-        
         render={({ field }) => (
-          <Checkbox 
+          <Checkbox
             className="col-span-2"
             onChange={field.onChange}
             onBlur={field.onBlur}
@@ -121,6 +134,8 @@ function SignUpForm() {
           </Checkbox>
         )}
       />
+
+      {!!errors.accepted && <p className="text-red-500">{errors.accepted?.message}</p>}
 
       <div className="flex justify-center col-span-2">
         <Button type="submit" color="primary" className="w-48">
