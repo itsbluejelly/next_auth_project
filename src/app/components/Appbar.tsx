@@ -1,5 +1,4 @@
-import {Navbar, NavbarContent, NavbarItem, Button} from "@nextui-org/react"
-import { Link } from "@nextui-org/react"
+import {Navbar, NavbarContent, NavbarItem, Button, Link} from "@nextui-org/react"
 import SignInButton from "./SignInButton"
 
 export default function Appbar(){
@@ -13,6 +12,7 @@ export default function Appbar(){
                     <Link
                         color="foreground"
                         href="/"
+                        className="hover:text-sky-500 transition-colors"
                     >Home</Link>
                 </NavbarItem>
             </NavbarContent>
