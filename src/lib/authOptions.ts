@@ -1,7 +1,7 @@
 import prisma from "@/src/lib/prisma"
 import {AuthOptions} from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from "bcrypt"
+import * as bcrypt from "bcrypt"
 import { User } from "@prisma/client"
 
 export const authOptions: AuthOptions = {
