@@ -11,3 +11,10 @@ declare module "next-auth/jwt"{
         user: User
     }
 }
+
+declare module NodeJS {
+  interface ProcessEnv {
+    SMPT_EMAIL: string;
+    SMTP_GMAIL_PASS: string;
+  }
+}
