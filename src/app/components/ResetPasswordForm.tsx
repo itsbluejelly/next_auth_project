@@ -6,9 +6,9 @@ import { passwordStrength } from "check-password-strength";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
-import PasswordStrength from "./PasswordStrength";
-import { resetPassword } from "@/lib/actions/authActions";
 import { toast } from "react-toastify";
+import PasswordComponent from "./PasswordComponent";
+import { resetPassword } from "@/src/lib/actions/authAction";
 
 interface Props {
   jwtUserId: string;
@@ -77,7 +77,7 @@ const ResetPasswordForm = ({ jwtUserId }: Props) => {
           </button>
         }
       />
-      <PasswordStrength passStrength={passStrength} />
+      <PasswordComponent passStrength={passStrength} />
       <Input
         type={visiblePass ? "text" : "password"}
         label="Confirm Password"

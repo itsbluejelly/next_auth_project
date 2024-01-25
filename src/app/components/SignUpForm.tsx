@@ -14,9 +14,9 @@ import validator from "validator";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { passwordStrength } from "check-password-strength";
-import PasswordStrength from "./PasswordStrength";
-import { registerUser } from "@/lib/actions/authActions";
 import { toast } from "react-toastify";
+import PasswordComponent from "./PasswordComponent";
+import { registerUser } from "@/src/lib/actions/authAction";
 
 const FormSchema = z
   .object({
@@ -141,7 +141,7 @@ const SignUpForm = () => {
           )
         }
       />
-      <PasswordStrength passStrength={passStrength} />
+      <PasswordComponent passStrength={passStrength} />
       <Input
         errorMessage={errors.confirmPassword?.message}
         isInvalid={!!errors.confirmPassword}
