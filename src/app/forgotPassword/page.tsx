@@ -1,5 +1,5 @@
 "use client"
-import { forgotPassword } from "@/lib/actions/authActions";
+import { forgotPassword } from "../../lib/actions/authAction";
 import { EnvelopeIcon } from "@heroicons/react/20/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Input } from "@nextui-org/react";
